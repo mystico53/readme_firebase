@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "firebase-readme-123",
+    "dev": "firebase-readme-123"
+  },
+  "targets": {},
+  "etags": {}
+}
