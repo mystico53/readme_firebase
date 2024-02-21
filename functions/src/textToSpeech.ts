@@ -13,7 +13,7 @@ const db = getFirestore();
 export const textToSpeech = functions.https.onRequest(async (req, res) => {
   console.log("Received request for text to speech conversion");
 
-  const {text, filename, languageCode = "en-US", voiceName = "en-US-Standard-C", speakingRate = 1.0} = req.body;
+  const {text, filename, userId, languageCode = "en-US", voiceName = "en-US-Standard-C", speakingRate = 1.0} = req.body;
   if (!text || !filename) {
     console.error("Text and filename are required");
     res.status(400).send("Text and filename are required");
@@ -37,6 +37,7 @@ export const textToSpeech = functions.https.onRequest(async (req, res) => {
     console.log(`Long-running operation started with ID: ${operation.name}`);
 
     const docRef = await db.collection("audioFiles").add({
+      userId,
       filename,
       status: "processing",
       gcs_uri: outputGcsUri,
@@ -51,10 +52,11 @@ export const textToSpeech = functions.https.onRequest(async (req, res) => {
 
     // Update Firestore with the error status
     const docRef = await db.collection("audioFiles").add({
+      userId,
       filename,
       status: "error",
       gcs_uri: outputGcsUri,
-      created_at: admin.firestore.FieldValue.serverTimestamp(),
+      created_at: FieldValue.serverTimestamp(),
       error: error instanceof Error ? error.message : "Unknown error",
     });
 
