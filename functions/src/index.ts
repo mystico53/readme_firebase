@@ -16,6 +16,10 @@ import {cleanText} from "./cleanText";
 export {cleanText};
 import {textToSpeech} from "./textToSpeech";
 export {textToSpeech};
+import {checkTTSStatus} from "./checkTTSStatus_old";
+export {checkTTSStatus};
+import {checkTTS} from "./checkTTS";
+export {checkTTS};
 console.log("Started Index.ts");
 
 

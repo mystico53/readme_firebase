@@ -1,9 +1,7 @@
 /* eslint-disable max-len */
 import * as functions from "firebase-functions";
 import {v1} from "@google-cloud/text-to-speech";
-// import * as admin from "firebase-admin";
-// import {FieldValue} from "@google-cloud/firestore";
-import {getFirestore, Timestamp, FieldValue, Firestore} from "firebase-admin/firestore";
+import {getFirestore, FieldValue} from "firebase-admin/firestore";
 
 const textToSpeechClient = new v1.TextToSpeechLongAudioSynthesizeClient();
 
@@ -13,15 +11,15 @@ const db = getFirestore();
 export const textToSpeech = functions.https.onRequest(async (req, res) => {
   console.log("Received request for text to speech conversion");
 
-  const {text, filename, userId, languageCode = "en-US", voiceName = "en-US-Standard-C", speakingRate = 1.0} = req.body;
-  if (!text || !filename) {
-    console.error("Text and filename are required");
-    res.status(400).send("Text and filename are required");
+  const {text, fileId, userId, languageCode = "en-US", voiceName = "en-US-Standard-C", speakingRate = 1.0} = req.body;
+  if (!text || !fileId) {
+    console.error("Text and fileId are required");
+    res.status(400).send("Text and fileId are required");
     return; // Ensure no further code is executed in this branch
   }
 
   const bucketName = "firebase-readme-123.appspot.com";
-  const outputGcsUri = `gs://${bucketName}/${filename}`;
+  const outputGcsUri = `gs://${bucketName}/${fileId}`;
   const parent = "projects/firebase-readme-123/locations/us-central1";
 
   const request = {
@@ -35,32 +33,42 @@ export const textToSpeech = functions.https.onRequest(async (req, res) => {
   try {
     const [operation] = await textToSpeechClient.synthesizeLongAudio(request);
     console.log(`Long-running operation started with ID: ${operation.name}`);
+    // Extract relevant information from the operation object
+    const operationDetails = {
+      name: operation.name ?? "Unknown Operation Name",
+      progressPercentage: (operation.metadata as any)?.progressPercentage,
+      done: operation.done,
+    };
 
-    const docRef = await db.collection("audioFiles").add({
+    // Log the extracted information
+    console.log("Long-running operation response:", JSON.stringify(operationDetails, null, 2));
+
+    await db.collection("audioFiles").doc(fileId).set({
       userId,
-      filename,
       status: "processing",
       gcs_uri: outputGcsUri,
       created_at: FieldValue.serverTimestamp(),
+      google_tts_operationname: operation.name,
+      google_tts_progress: (operation.metadata as any)?.progressPercentage,
+      done: operation.done,
     });
 
-    console.log(`Document created with ID: ${docRef.id}`);
+    console.log(`Document created with ID: ${fileId}`);
 
     res.send({message: "Text-to-Speech long synthesis initiated", operationId: operation.name});
   } catch (error) {
     console.error("Error initiating Text-to-Speech long synthesis:", error);
 
     // Update Firestore with the error status
-    const docRef = await db.collection("audioFiles").add({
+    await db.collection("audioFiles").doc(fileId).set({
       userId,
-      filename,
       status: "error",
       gcs_uri: outputGcsUri,
       created_at: FieldValue.serverTimestamp(),
       error: error instanceof Error ? error.message : "Unknown error",
     });
 
-    console.log(`Error document created with ID: ${docRef.id}`);
+    console.log(`Error document created with ID: ${fileId}`);
 
     if (error instanceof Error) { // Type assertion for the error object
       res.status(500).send(error.message);
