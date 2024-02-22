@@ -1,12 +1,12 @@
 /* eslint-disable max-len */
 import * as functions from "firebase-functions";
+import {v1} from "@google-cloud/text-to-speech";
 import {getFirestore} from "firebase-admin/firestore";
 
-// Assuming firebase-admin has been initialized somewhere in your project.
+const textToSpeechClient = new v1.TextToSpeechLongAudioSynthesizeClient();
 const db = getFirestore();
 
 export const checkTTS = functions.https.onRequest(async (request, response) => {
-  // Access the fileId query parameter
   const fileId = request.query.fileId;
 
   if (!fileId) {
@@ -14,37 +14,53 @@ export const checkTTS = functions.https.onRequest(async (request, response) => {
     return;
   }
 
-  console.log(`Received fileId: ${fileId}`);
+  // Define docRef outside the try blocks to make it accessible throughout
+  const docRef = db.collection("audioFiles").doc(fileId.toString());
 
   try {
-    const docRef = db.collection("audioFiles").doc(fileId.toString());
     const doc = await docRef.get();
 
     if (!doc.exists) {
-      console.log(`No document found for fileId: ${fileId}`);
       response.status(404).send(`No document found for fileId: ${fileId}`);
       return;
     }
 
     const docData = doc.data();
-    if (docData) { // Check if docData is not undefined
-      console.log(`Document data for fileId ${fileId}:`, docData);
-      response.json({
-        status: "Document found",
-        data: {
-          fileId: fileId,
-          google_tts_operationname: docData.google_tts_operationname,
-          google_tts_progress: docData.google_tts_progress,
-          done: docData.done,
-          status: docData.status,
-        },
-      });
-    } else {
-      console.log(`Document data is undefined for fileId: ${fileId}`);
+    if (!docData) {
       response.status(404).send(`Document data is undefined for fileId: ${fileId}`);
+      return;
     }
+
+    // Ensure operationName is defined before proceeding
+    const operationName = docData.google_tts_operationname;
+    if (!operationName) {
+      response.status(404).send("Operation name not found in the document.");
+      return;
+    }
+
+    // Correctly handle the LROperation
+    const operation = await textToSpeechClient.checkSynthesizeLongAudioProgress(operationName);
+    const [operationResponse, metadata] = await operation.promise();
+
+    await docRef.update({
+      google_tts_progress: metadata.progressPercentage,
+      done: operation.done,
+    });
+
+    console.log("Sending response:", {
+      progressPercentage: metadata.progressPercentage,
+      done: operation.done,
+    });
+
+    console.log("Operation response:", operationResponse);
+
+    // Use the Cloud Function's response parameter to send JSON back to the client
+    response.json({
+      progressPercentage: metadata.progressPercentage,
+      done: operation.done,
+    });
   } catch (error) {
-    console.error(`Error retrieving document for fileId ${fileId}:`, error);
+    console.error("Error checking TTS operation status:", error);
     response.status(500).send(`Error retrieving document: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 });
