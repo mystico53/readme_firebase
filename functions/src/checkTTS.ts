@@ -6,6 +6,15 @@ import {getFirestore} from "firebase-admin/firestore";
 const textToSpeechClient = new v1.TextToSpeechLongAudioSynthesizeClient();
 const db = getFirestore();
 
+// Function to convert GCS URI to HTTPS URL
+// eslint-disable-next-line require-jsdoc
+function convertGsUrlToHttps(gsUrl: string): string {
+  const [, bucketAndPath] = gsUrl.split("gs://");
+  const [bucketName, ...pathComponents] = bucketAndPath.split("/");
+  const encodedPath = pathComponents.map((component) => encodeURIComponent(component)).join("/");
+  return `https://storage.googleapis.com/${bucketName}/${encodedPath}`;
+}
+
 export const checkTTS = functions.https.onRequest(async (request, response) => {
   const fileId = request.query.fileId;
 
@@ -14,7 +23,6 @@ export const checkTTS = functions.https.onRequest(async (request, response) => {
     return;
   }
 
-  // Define docRef outside the try blocks to make it accessible throughout
   const docRef = db.collection("audioFiles").doc(fileId.toString());
 
   try {
@@ -31,34 +39,41 @@ export const checkTTS = functions.https.onRequest(async (request, response) => {
       return;
     }
 
-    // Ensure operationName is defined before proceeding
     const operationName = docData.google_tts_operationname;
     if (!operationName) {
       response.status(404).send("Operation name not found in the document.");
       return;
     }
 
-    // Correctly handle the LROperation
     const operation = await textToSpeechClient.checkSynthesizeLongAudioProgress(operationName);
-    const [operationResponse, metadata] = await operation.promise();
+    const [, metadata] = await operation.promise();
 
     await docRef.update({
       google_tts_progress: metadata.progressPercentage,
       done: operation.done,
     });
 
-    console.log("Sending response:", {
+    // Convert the GCS URI to an HTTPS URL
+    const httpsUrl = docData.gcs_uri ? convertGsUrlToHttps(docData.gcs_uri) : null;
+
+    if (httpsUrl) {
+      await docRef.update({
+        httpsUrl: httpsUrl,
+      }).then(() => console.log("Document successfully updated with HTTPS URL"))
+        .catch((error) => console.error("Error updating document with HTTPS URL:", error));
+    }
+
+    const responseObject = {
       progressPercentage: metadata.progressPercentage,
       done: operation.done,
-    });
+      gcsUri: httpsUrl, // The converted HTTPS URL
+    };
 
-    console.log("Operation response:", operationResponse);
+    // Log the response object to the console
+    console.log("Sending response to client:", responseObject);
 
-    // Use the Cloud Function's response parameter to send JSON back to the client
-    response.json({
-      progressPercentage: metadata.progressPercentage,
-      done: operation.done,
-    });
+    // Send the response object back to the client
+    response.json(responseObject);
   } catch (error) {
     console.error("Error checking TTS operation status:", error);
     response.status(500).send(`Error retrieving document: ${error instanceof Error ? error.message : "Unknown error"}`);
