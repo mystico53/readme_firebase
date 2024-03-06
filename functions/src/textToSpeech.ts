@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import * as functions from "firebase-functions";
 import {v1} from "@google-cloud/text-to-speech";
-import {getFirestore, FieldValue} from "firebase-admin/firestore";
+import {getFirestore} from "firebase-admin/firestore";
 
 const textToSpeechClient = new v1.TextToSpeechLongAudioSynthesizeClient();
 
@@ -43,28 +43,29 @@ export const textToSpeech = functions.https.onRequest(async (req, res) => {
     // Log the extracted information
     console.log("Long-running operation response:", JSON.stringify(operationDetails, null, 2));
 
-    await db.collection("audioFiles").doc(fileId).set({
+    const updatedFields = {
       userId,
       status: "processing",
       gcs_uri: outputGcsUri,
-      created_at: FieldValue.serverTimestamp(),
       google_tts_operationname: operation.name,
       google_tts_progress: (operation.metadata as any)?.progressPercentage,
       done: operation.done,
-    });
+    };
 
-    console.log(`Document created with ID: ${fileId}`);
+    await db.collection("audioFiles").doc(fileId).update(updatedFields);
+
+    console.log(`Document updated with ID: ${fileId}`);
+    console.log("Updated fields:", updatedFields);
 
     res.send({message: "Text-to-Speech long synthesis initiated", operationId: operation.name});
   } catch (error) {
     console.error("Error initiating Text-to-Speech long synthesis:", error);
 
     // Update Firestore with the error status
-    await db.collection("audioFiles").doc(fileId).set({
+    await db.collection("audioFiles").doc(fileId).update({
       userId,
       status: "error",
       gcs_uri: outputGcsUri,
-      created_at: FieldValue.serverTimestamp(),
       error: error instanceof Error ? error.message : "Unknown error",
     });
 

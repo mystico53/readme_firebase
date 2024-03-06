@@ -3,12 +3,15 @@ import * as functions from "firebase-functions";
 import {v1} from "@google-cloud/text-to-speech";
 import {getFirestore} from "firebase-admin/firestore";
 
+console.log("init checktts");
+
 const textToSpeechClient = new v1.TextToSpeechLongAudioSynthesizeClient();
 const db = getFirestore();
 
 // Function to convert GCS URI to HTTPS URL
 // eslint-disable-next-line require-jsdoc
 function convertGsUrlToHttps(gsUrl: string): string {
+  console.log("called convert url");
   const [, bucketAndPath] = gsUrl.split("gs://");
   const [bucketName, ...pathComponents] = bucketAndPath.split("/");
   const encodedPath = pathComponents.map((component) => encodeURIComponent(component)).join("/");
@@ -16,6 +19,7 @@ function convertGsUrlToHttps(gsUrl: string): string {
 }
 
 export const checkTTS = functions.https.onRequest(async (request, response) => {
+  console.log("starting checktts");
   const fileId = request.query.fileId;
 
   if (!fileId) {
@@ -51,9 +55,11 @@ export const checkTTS = functions.https.onRequest(async (request, response) => {
     await docRef.update({
       google_tts_progress: metadata.progressPercentage,
       done: operation.done,
+      status: "ready",
     });
 
     // Convert the GCS URI to an HTTPS URL
+    console.log("converting url");
     const httpsUrl = docData.gcs_uri ? convertGsUrlToHttps(docData.gcs_uri) : null;
 
     if (httpsUrl) {

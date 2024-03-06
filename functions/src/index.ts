@@ -20,6 +20,8 @@ import {checkTTSStatus} from "./checkTTSStatus_old";
 export {checkTTSStatus};
 import {checkTTS} from "./checkTTS";
 export {checkTTS};
+import {createFirestoreDocument} from "./createFirestoreDocument";
+export {createFirestoreDocument};
 console.log("Started Index.ts");
 
 
