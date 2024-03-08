@@ -6,7 +6,6 @@ const db = getFirestore();
 
 export const createFirestoreDocument = functions.https.onRequest(async (req, res) => {
   const {fileId} = req.body;
-
   if (!fileId) {
     console.error("fileId is required");
     res.status(400).send("fileId is required");
@@ -17,6 +16,7 @@ export const createFirestoreDocument = functions.https.onRequest(async (req, res
     await db.collection("audioFiles").doc(fileId).set({
       // Add any initial fields you want to set for the document
       created_at: FieldValue.serverTimestamp(),
+      status: "pending", // Add the initial status field
     });
 
     console.log(`Firestore document created with ID: ${fileId}`);
