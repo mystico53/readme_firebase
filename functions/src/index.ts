@@ -22,6 +22,12 @@ import {checkTTS} from "./checkTTS";
 export {checkTTS};
 import {createFirestoreDocument} from "./createFirestoreDocument";
 export {createFirestoreDocument};
+import {generateTitle} from "./generateTitle";
+export {generateTitle};
+import {processRawIntent} from "./processRawIntent";
+export {processRawIntent};
+
+
 console.log("Started Index.ts");
 
 
