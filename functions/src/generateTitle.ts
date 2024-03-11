@@ -21,47 +21,60 @@ const openai = new OpenAI({
 });
 
 export const generateTitle = functions.runWith({
-  timeoutSeconds: 60, // Set your desired timeout up to the maximum allowed.
+  timeoutSeconds: 60,
 }).https.onRequest((request, response) => {
   cors(request, response, async () => {
     try {
-      console.log("Title generation triggered with request:", JSON.stringify(request.body)); // Debug: Log request body
+      console.log("Title generation triggered with request:", JSON.stringify(request.body));
+
       const {text, documentId} = request.body;
+      console.log("text for title gen", text + "document id", documentId);
+
+      if (!text || text.trim() === "") {
+        console.error("Text is missing or empty in the request body.");
+        response.status(400).send("Text is missing or empty in the request body.");
+        return;
+      }
 
       let title = "";
 
       if (text.length <= 99) {
-        console.log("Text is less than or equal to 99 characters. Using text as title."); // Debug: Log short text handling
+        console.log("Text is less than or equal to 99 characters. Using text as title.");
         title = text;
       } else {
-        console.log("Text exceeds 99 characters. Generating title using OpenAI."); // Debug: Log title generation initiation
+        console.log("Text exceeds 99 characters. Generating title using OpenAI.");
+
         const instructions = "Summarize the following text in three words";
-        const prompt = instructions + "\n";
+        console.log("instructions", instructions);
+        const prompt = instructions + "\n" + text;
+        console.log("Debug: Generated instructions for OpenAI.", "Instructions:", instructions, "Text:", text);
 
         const stream = await openai.chat.completions.create({
           model: "gpt-3.5-turbo",
           messages: [{role: "user", content: prompt}],
-          max_tokens: 50,
           stream: true,
         });
 
-        console.log("+++ OpenAI stream initiated. +++"); // Debug: Confirm OpenAI stream initiation
+        console.log("+++ OpenAI stream initiated. +++");
+
         for await (const chunk of stream) {
           const content = chunk.choices[0]?.delta?.content || "";
-          console.log(`Received chunk: ${content}`); // Debug: Log received chunk content
+          console.log(`Received chunk: ${content}`);
           title += content;
         }
-        console.log(`Generated title: ${title}`); // Debug: Log generated title
+
+        console.log(`Generated title: ${title}`);
       }
 
       await admin.firestore().collection("audioFiles").doc(documentId).update({
         title: title,
       });
 
-      console.log(`Firestore document updated with title for documentId: ${documentId}`); // Debug: Log Firestore document update
+      console.log(`Firestore document updated with title for documentId: ${documentId}`);
+
       response.json({title: title});
     } catch (error) {
-      console.error("Error generating title:", error); // Debug: Log error
+      console.error("Error generating title:", error);
       response.status(500).send("Error generating title.");
     }
   });
