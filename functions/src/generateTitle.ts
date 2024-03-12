@@ -44,7 +44,7 @@ export const generateTitle = functions.runWith({
       } else {
         console.log("Text exceeds 99 characters. Generating title using OpenAI.");
 
-        const instructions = "Summarize the following text in three words";
+        const instructions = "Summarize the following text in five words, it should be specific and sound like good journalism";
         console.log("instructions", instructions);
         const prompt = instructions + "\n" + text;
         console.log("Debug: Generated instructions for OpenAI.", "Instructions:", instructions, "Text:", text);

@@ -1,5 +1,3 @@
-/* eslint-disable require-jsdoc */
-/* eslint-disable eol-last */
 import * as functions from "firebase-functions";
 
 export const processRawIntent = functions.https.onRequest(async (req, res) => {
@@ -13,8 +11,13 @@ export const processRawIntent = functions.https.onRequest(async (req, res) => {
 
     const lines = text.split("\n");
 
+    // eslint-disable-next-line max-len
+    // Check each line for URLs starting with http or https and remove those lines
+    // eslint-disable-next-line max-len
+    const linesWithoutUrls = lines.filter((line: string) => !line.match(/https?:\/\//));
+
     // Count sentences in each line and filter lines with at least two sentences
-    const filteredLines = lines.filter((line: string) => {
+    const filteredLines = linesWithoutUrls.filter((line: string) => {
       const sentenceCount = countSentences(line);
       return sentenceCount >= 2;
     });
@@ -33,6 +36,7 @@ export const processRawIntent = functions.https.onRequest(async (req, res) => {
 });
 
 // Helper function to count the number of sentences in a string
+// eslint-disable-next-line require-jsdoc
 function countSentences(text: string): number {
   const sentences = text.match(/[^.!?]+[.!?]/g);
   return sentences ? sentences.length : 0;
