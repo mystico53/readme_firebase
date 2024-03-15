@@ -4,34 +4,33 @@ import {FieldValue, getFirestore} from "firebase-admin/firestore";
 
 // Initialize Firestore database
 const db = getFirestore();
-
-console.log("Debug: Initialized Firestore"); // Debug message for Firestore initialization
+console.log("Debug: Initialized Firestore");
 
 export const createFirestoreDocument = functions.https.onRequest(async (req, res) => {
-  console.log("Debug: Received request to create Firestore document"); // Debug when function is triggered
+  console.log("Debug: Received request to create Firestore document");
 
-  const {fileId, status} = req.body;
-  console.log(`Debug: Request body contains fileId: ${fileId} and status: ${status}`); // Debug contents of request body
+  const {fileId, status, userId} = req.body;
+  console.log(`Debug: Request body contains fileId: ${fileId}, status: ${status}, and userId: ${userId}`);
 
-  if (!fileId) {
-    console.error("fileId is required");
-    res.status(400).send("fileId is required");
+  if (!fileId || !userId) {
+    console.error("fileId and userId are required");
+    res.status(400).send("fileId and userId are required");
     return;
   }
 
   try {
-    console.log(`Debug: Attempting to create Firestore document for fileId: ${fileId}`); // Debug before attempting to create document
+    console.log(`Debug: Attempting to create Firestore document for fileId: ${fileId} and userId: ${userId}`);
 
     await db.collection("audioFiles").doc(fileId).set({
-      // Add any initial fields you want to set for the document
       created_at: FieldValue.serverTimestamp(),
-      status: status || "pending", // Use the status from the request body or default to "pending"
+      status: status || "pending",
+      userId: userId,
     });
 
-    console.log(`Firestore document created with ID: ${fileId} and status: ${status || "pending"}`); // Confirmation of document creation
+    console.log(`Firestore document created with ID: ${fileId}, status: ${status || "pending"}, and userId: ${userId}`);
     res.send({message: "Firestore document created"});
   } catch (error) {
-    console.error("Error creating Firestore document:", error); // Log error if document creation fails
+    console.error("Error creating Firestore document:", error);
     res.status(500).send("An error occurred while creating the Firestore document");
   }
 });

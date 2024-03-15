@@ -6,9 +6,11 @@ import * as dotenv from "dotenv";
 import * as admin from "firebase-admin";
 
 dotenv.config();
+
 const cors = corsLib({origin: true});
 
 const openaiApiKey = process.env.FUNCTIONS_OPENAI_KEY || functions.config().openai?.key;
+
 if (!openaiApiKey) {
   console.error("No API key found in Firebase Functions configuration or environment variables.");
   throw new Error("OpenAI API key is not set in Firebase Functions configuration or environment variables.");
@@ -26,9 +28,8 @@ export const generateTitle = functions.runWith({
   cors(request, response, async () => {
     try {
       console.log("Title generation triggered with request:", JSON.stringify(request.body));
-
-      const {text, documentId} = request.body;
-      console.log("text for title gen", text + "document id", documentId);
+      const {text, documentId, userId} = request.body;
+      console.log("Text for title gen:", text, "Document ID:", documentId, "User ID:", userId);
 
       if (!text || text.trim() === "") {
         console.error("Text is missing or empty in the request body.");
@@ -43,9 +44,8 @@ export const generateTitle = functions.runWith({
         title = text;
       } else {
         console.log("Text exceeds 99 characters. Generating title using OpenAI.");
-
         const instructions = "Summarize the following text in five words, it should be specific and sound like good journalism";
-        console.log("instructions", instructions);
+        console.log("Instructions:", instructions);
         const prompt = instructions + "\n" + text;
         console.log("Debug: Generated instructions for OpenAI.", "Instructions:", instructions, "Text:", text);
 
@@ -68,9 +68,10 @@ export const generateTitle = functions.runWith({
 
       await admin.firestore().collection("audioFiles").doc(documentId).update({
         title: title,
+        userId: userId,
       });
 
-      console.log(`Firestore document updated with title for documentId: ${documentId}`);
+      console.log(`Firestore document updated with title for documentId: ${documentId} and userId: ${userId}`);
 
       response.json({title: title});
     } catch (error) {
