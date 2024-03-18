@@ -4,6 +4,7 @@ service cloud.firestore {
     match /audioFiles/{document} {
       allow read: if true;
       allow write: if request.resource.data.userId is string;
+      allow delete: if true;
     }
   }
 }
