@@ -45,7 +45,7 @@ export const textToSpeech = functions.https.onRequest(async (req, res) => {
 
     const updatedFields = {
       userId,
-      status: "processing",
+      status: "generating speech",
       gcs_uri: outputGcsUri,
       google_tts_operationname: operation.name,
       google_tts_progress: (operation.metadata as any)?.progressPercentage,

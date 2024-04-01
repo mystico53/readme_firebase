@@ -26,6 +26,8 @@ import {generateTitle} from "./generateTitle";
 export {generateTitle};
 import {processRawIntent} from "./processRawIntent";
 export {processRawIntent};
+import {submitFeedback} from "./submitFeedback";
+export {submitFeedback};
 
 
 console.log("Started Index.ts");

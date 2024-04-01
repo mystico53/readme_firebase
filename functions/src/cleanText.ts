@@ -23,7 +23,7 @@ export const cleanText = functions.runWith({
   cors(request, response, async () => {
     try {
       console.log("Function triggered with request:", JSON.stringify(request.body));
-      const instructions = "The following text is long, it has thousands of characters and might be messy, I want to read it to someone, extract the article text verbatim. The goal is to have the full article text without any clutter. Do not include any captions of photos.";
+      const instructions = "Summarize the text. Start with the main idea, followed by three key points.";
       // const instructions = " Read the following text and extract only the main article content, ignoring all ads, headers, and any other clutter.";
 
       const {text} = request.body;
