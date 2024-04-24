@@ -14,20 +14,47 @@ export const processRawIntent = functions.https.onRequest(async (req, res) => {
       return;
     }
 
-    console.log(`Received text: ${text}`);
+    console.log(`000 Received text: ${text}`);
 
     let htmlText = text;
     if (text.includes("\\n\\n")) {
-      const htmlTextArray = htmlText.split("\\n\\n");
+      console.log("111 Initial text has '\\n\\n':", text); // Debug: Check the initial text condition
 
-      // First filter out items that have 3 words or less
-      const filteredTextArray = htmlTextArray.filter((item: { split: (arg0: RegExp) => { (): any; new(): any; filter: { (arg0: (word: any) => any): { (): any; new(): any; length: number; }; new(): any; }; }; }) => {
-        // Split item into words and check the count
-        return item.split(/\s+/).filter((word) => word).length > 3;
+      let htmlTextArray = htmlText.split("\\n\\n");
+      console.log("222 After split by '\\n\\n':", htmlTextArray); // Debug: See the array after split
+
+      htmlTextArray = htmlTextArray.map((item: string) => {
+        console.log("333 Before replace in map:", item); // Debug: Log item before replacement
+        const replacedItem = item.replace(/\\"/g, "\"");
+        console.log("444 After replace in map:", replacedItem); // Debug: Log item after replacement
+        return replacedItem;
       });
 
+      // First filter out items that have 3 words or less
+      const filteredTextArray = htmlTextArray.filter((item: string) => {
+        // Split item into words and check the count
+        const words = item.split(/\s+/).filter((word) => word);
+        console.log("555 Words in item after split and filter:", words); // Debug: Log words array
+        return words.length > 3;
+      });
+
+      console.log("666 Filtered array, items with more than 3 words:", filteredTextArray); // Debug: Log the final filtered array
+
+
       // Further filter out items containing '\n' and then join the remaining items
-      htmlText = filteredTextArray.filter((item: string | string[]) => !item.includes("\\n")).join("\n\n");
+      console.log("Before filtering '\\n' from items:", filteredTextArray); // Debug: Log the array before filtering '\n'
+
+      htmlText = filteredTextArray.filter((item: string | string[]) => {
+        const includesNewLine = item.includes("\\n");
+        console.log("Item checked for '\\n':", item, "Contains '\\n':", includesNewLine); // Debug: Check each item for '\n'
+        return !includesNewLine;
+      });
+
+      console.log("After filtering '\\n' from items:", htmlText); // Debug: Log the array after filtering out '\n'
+
+      htmlText = htmlText.join("\n\n");
+      console.log("Final joined text:", htmlText); // Debug: Log the final text after joining
+
 
       res.status(200).json({text: htmlText});
     } else {

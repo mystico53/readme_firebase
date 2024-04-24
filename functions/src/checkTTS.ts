@@ -48,7 +48,6 @@ export const checkTTS = functions.https.onRequest(async (request, response) => {
     }
 
     const docData = doc.data();
-    console.log("Document data:", docData);
 
     if (!docData) {
       console.error("Document data is undefined for fileId:", fileId);

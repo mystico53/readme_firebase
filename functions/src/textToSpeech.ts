@@ -30,6 +30,8 @@ export const textToSpeech = functions.https.onRequest(async (req, res) => {
     outputGcsUri,
   };
 
+  console.log("Text to be synthesized:", text);
+
   try {
     const [operation] = await textToSpeechClient.synthesizeLongAudio(request);
     console.log(`Long-running operation started with ID: ${operation.name}`);

@@ -22,7 +22,7 @@ export const cleanText = functions.runWith({
 }).https.onRequest((request, response) => {
   cors(request, response, async () => {
     try {
-      console.log("Function triggered with request:", JSON.stringify(request.body));
+      // console.log("Function triggered with request:", JSON.stringify(request.body));
       const instructions = "Summarize the text. Start with the main idea, followed by three key points.";
       // const instructions = " Read the following text and extract only the main article content, ignoring all ads, headers, and any other clutter.";
 
@@ -47,7 +47,7 @@ export const cleanText = functions.runWith({
         message += content;
       }
 
-      console.log(`Final accumulated message: ${message.substring(0, 100)}...`); // Log the beginning of the final message to avoid log overflow
+      // console.log(`Final accumulated message: ${message.substring(0, 100)}...`); // Log the beginning of the final message to avoid log overflow
 
       response.json({generated_text: message});
     } catch (error) {

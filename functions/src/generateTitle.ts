@@ -27,9 +27,9 @@ export const generateTitle = functions.runWith({
 }).https.onRequest((request, response) => {
   cors(request, response, async () => {
     try {
-      console.log("Title generation triggered with request:", JSON.stringify(request.body));
+      // console.log("Title generation triggered with request:", JSON.stringify(request.body));
       const {text, documentId, userId} = request.body;
-      console.log("Text for title gen:", text, "Document ID:", documentId, "User ID:", userId);
+      // console.log("Text for title gen:", text, "Document ID:", documentId, "User ID:", userId);
 
       if (!text || text.trim() === "") {
         console.error("Text is missing or empty in the request body.");
@@ -44,7 +44,8 @@ export const generateTitle = functions.runWith({
         title = text;
       } else {
         console.log("Text exceeds 99 characters. Generating title using OpenAI.");
-        const instructions = "Summarize the following text in five words, it should be specific and sound like good journalism";
+        // const instructions = "Summarize the following text in five words, it should be specific and sound like good journalism";
+        const instructions = "Please generate a clear, concise, and informative title for the given text following these guidelines. The title should be the language of given text. Keep the title short, ideally under 9 words, avoid clickbait or vague language that doesn't convey the main point of the article, include keywords related to the main topic or theme of the text, and follow a consistent structure such as Main Topic - Specific Aspect or Event. An example of the desired title format is Climate Change - New Study Shows Accelerated Ice Melt in Antarctica. Please generate a title for the following text.";
         console.log("Instructions:", instructions);
         const prompt = instructions + "\n" + text;
         console.log("Debug: Generated instructions for OpenAI.", "Instructions:", instructions, "Text:", text);
