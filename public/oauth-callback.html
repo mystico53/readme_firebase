@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Callback</title>
+    <script>
+        function handleRedirect() {
+            // Extract the authorization code from the URL query parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const authorizationCode = urlParams.get('code');
+            
+            // Construct the deep link URL with the authorization code
+            const deepLinkUrl = `lismeapp://oauth2callback?code=${authorizationCode}`;
+            
+            // Redirect to the deep link URL
+            window.location.href = deepLinkUrl;
+        }
+    </script>
+</head>
+<body onload="handleRedirect()">
+    <h1>Lisme OAuth Callback</h1>
+    <p>Please wait while we redirect you...</p>
+</body>
+</html>

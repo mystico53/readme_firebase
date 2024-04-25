@@ -45,5 +45,30 @@
       "firebase-debug.*.log"
     ],
     "codebase": "default"
+  },
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "/.well-known/apple-app-site-association",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/.well-known/**",
+        "destination": "/.well-known/**"
+      }
+    ]
   }
 }
