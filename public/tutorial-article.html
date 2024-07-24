@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New App Turns News Into Audio, Helping Busy Readers Stay Informed | The Digital Times</title>
+    <style>
+        :root {
+            font-size: 16px;
+        }
+
+        body {
+            font-family: Georgia, serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1.25rem;
+        }
+
+        header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 0.625rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .logo {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 2.25rem;
+            font-weight: bold;
+        }
+
+        .date {
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.625rem;
+        }
+
+        .byline {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 1.25rem;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            margin: 1.25rem 0;
+            width: 60%;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content p:first-of-type::first-letter {
+            float: left;
+            font-size: 3rem;
+            line-height: 2.5rem;
+            padding-top: 0.25rem;
+            padding-right: 0.5rem;
+            padding-left: 0.1875rem;
+        }
+
+        .share-button {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 1rem 0;
+        }
+
+        .share-button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .share-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .share-text {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            color: black;
+        }
+
+        @media (max-width: 600px) {
+            :root {
+                font-size: 14px;
+            }
+
+            body {
+                padding: 0.875rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .content img {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">Lisme Tutorial</div>
+        <div class="date">May 15, 2035</div>
+    </header>
+
+    <article>
+        <h1>Share this news article with Lisme to turn it into a mini audiobook</h1>
+        <div class="byline">Try it now</div>
+
+        <button class="share-button" onclick="shareContent()">
+            <svg class="share-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path fill="black"
+                    d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
+            </svg>
+            <span class="share-text">Share with Lisme</span>
+        </button>
+
+        <div class="content">
+            <p>LOS ANGELES — A new app called Lisme is offering a solution for those who struggle to keep up with their
+                reading lists. Launched this week, Lisme transforms written content into short audiobooks, allowing
+                users to consume news and articles on the go.</p>
+
+            <p>The app, whose name is pronounced "liss me," converts text-based content into audio format and adds
+                these newly created audiobooks to a personalized playlist. This enables users to save articles for later
+                listening, turning idle moments into opportunities for learning and staying informed.</p>
+
+            <img src="/assets/imgs/lisme tutorial article.webp" alt="Woman listening to Lisme app while commuting" />
+
+            <p>"We created Lisme for the millions of people who want to stay up-to-date but find themselves short on
+                time to read," said Konstantin, the app's co-founder and CEO. "Now, your commute, workout, or household
+                chores can become productive listening time."</p>
+
+            <p>Users can save articles to their Lisme playlist by sharing links with the
+                app. Lisme then uses advanced text-to-speech technology to create natural-sounding audio versions of the
+                content, typically available within less than a minute.</p>
+
+            <p>Early adopters have praised the app's user-friendly interface and the quality of its audio conversions.
+                "I've doubled my 'reading' since I started using Lisme," said Mark Thompson, a beta tester.</p>
+
+            <p>As people increasingly struggle to balance their desire to stay informed with busy schedules, Lisme may
+                represent the future of content consumption. The app is available for download on Android
+                devices, with a web version planned for release later this year.</p>
+        </div>
+    </article>
+
+    <button class="share-button" onclick="shareContent()">
+        <svg class="share-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="black"
+                d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
+        </svg>
+        <span class="share-text">Share with Lisme</span>
+    </button>
+
+    <script>
+        function shareContent() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'New App Turns News Into Audio, Helping Busy Readers Stay Informed',
+                    text: 'Check out this article about Lisme, an app that turns news into audio!',
+                    url: window.location.href
+                }).then(() => {
+                    console.log('Thanks for sharing!');
+                }).catch(console.error);
+            } else {
+                alert('Web Share API not supported on this browser. Please share the URL manually.');
+            }
+        }
+    </script>
+</body>
+
+</html>
